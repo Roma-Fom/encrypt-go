@@ -2,12 +2,15 @@ package encrypt
 
 import (
 	"crypto"
+	"crypto/hmac"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
+	"crypto/sha512"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	"hash"
 )
 
 func SignAssymetric(data, privateKeyPEM string) (string, error) {
@@ -66,4 +69,31 @@ func VerifyAssymetric(data, signature, publicKeyPEM string) (bool, error) {
 
 	err = rsa.VerifyPKCS1v15(rsaPublicKey, crypto.SHA256, hashed[:], sig)
 	return err == nil, nil
+}
+
+func SignSymmetric(data, secret, algorithm string) (string, error) {
+	var h hash.Hash
+	switch algorithm {
+	case "sha256":
+		h = hmac.New(sha256.New, []byte(secret))
+	case "sha512":
+		h = hmac.New(sha512.New, []byte(secret))
+	default:
+		return "", &EncryptError{
+			Message: "Invalid algorithm",
+			Reason:  "Algorithm must be sha256 or sha512",
+			Code:    "SIGN_ERROR",
+		}
+	}
+
+	h.Write([]byte(data))
+	return base64.StdEncoding.EncodeToString(h.Sum(nil)), nil
+}
+
+func VerifySymmetric(data, signature, secret, algorithm string) (bool, error) {
+	expectedSig, err := SignSymmetric(data, secret, algorithm)
+	if err != nil {
+		return false, nil
+	}
+	return expectedSig == signature, nil
 }
