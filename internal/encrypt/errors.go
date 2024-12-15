@@ -17,4 +17,5 @@ const (
 	ErrorCodeDecrypt    = "DECRYPT_ERROR"
 	ErrorCodeHash       = "HASH_ERROR"
 	ErrorCodeInvalidKey = "INVALID_KEY_LENGTH"
+	ErrorCodeNanoID     = "NANOID_ERROR"
 )

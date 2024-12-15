@@ -6,6 +6,8 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	"encoding/pem"
+
+	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
 type RSAKeyPair struct {
@@ -66,4 +68,22 @@ func GenerateRSAKeyPair() (*RSAKeyPair, error) {
 		PrivateKey: string(privateKeyPEM),
 		PublicKey:  string(publicKeyPEM),
 	}, nil
+}
+
+func GenerateNanoID(prefix string, size int) (string, error) {
+	if size < 21 {
+		size = 21
+	}
+	id, err := gonanoid.New(size)
+	if err != nil {
+		return "", &EncryptError{
+			Message: err.Error(),
+			Reason:  "Failed to generate NanoID",
+			Code:    ErrorCodeNanoID,
+		}
+	}
+	if prefix != "" {
+		return prefix + "_" + id, nil
+	}
+	return id, nil
 }
