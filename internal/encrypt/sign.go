@@ -13,6 +13,53 @@ import (
 	"hash"
 )
 
+type SignOptions struct {
+	Data       string
+	PrivateKey string
+	Secret     string
+	Algorithm  string
+}
+
+type VerifyOptions struct {
+	Data      string
+	Signature string
+	PublicKey string
+	Secret    string
+	Algorithm string
+}
+
+func Sign(options SignOptions) (string, error) {
+	if options.PrivateKey != "" {
+		return SignAssymetric(options.Data, options.PrivateKey)
+	}
+	if options.Secret == "" {
+		return "", &EncryptError{
+			Message: "No signing method provided",
+			Reason:  "Either private key or secret must be provided",
+			Code:    "SIGN_ERROR",
+		}
+	}
+	return SignSymmetric(options.Data, options.Secret, options.Algorithm)
+}
+
+func Verify(options VerifyOptions) bool {
+	if options.PublicKey != "" {
+		result, err := VerifyAssymetric(options.Data, options.Signature, options.PublicKey)
+		if err != nil {
+			return false
+		}
+		return result
+	}
+	if options.Secret != "" {
+		result, err := VerifySymmetric(options.Data, options.Signature, options.Secret, options.Algorithm)
+		if err != nil {
+			return false
+		}
+		return result
+	}
+	return false
+}
+
 func SignAssymetric(data, privateKeyPEM string) (string, error) {
 	block, _ := pem.Decode([]byte(privateKeyPEM))
 	if block == nil {
