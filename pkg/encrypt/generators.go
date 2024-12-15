@@ -14,11 +14,13 @@ import (
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
+// RSAKeyPair represents a pair of RSA private and public keys in PEM format
 type RSAKeyPair struct {
 	PrivateKey string
 	PublicKey  string
 }
 
+// GenerateRSAKeyPair generates a new RSA key pair with 2048-bit key length
 func GenerateSecretKey(length int) (string, error) {
 	if length != 16 && length != 32 {
 		return "", &EncryptError{
@@ -40,6 +42,7 @@ func GenerateSecretKey(length int) (string, error) {
 	return hex.EncodeToString(key), nil
 }
 
+// GenerateRSAKeyPair generates a new RSA key pair with 2048-bit key length
 func GenerateRSAKeyPair() (*RSAKeyPair, error) {
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -92,6 +95,7 @@ func GenerateNanoID(prefix string, size int) (string, error) {
 	return id, nil
 }
 
+// CanonicalJSON converts a JSON object to a canonical string
 func CanonicalJSON(data interface{}) (string, error) {
 	// Convert to map to handle arbitrary JSON
 	var mapData map[string]interface{}

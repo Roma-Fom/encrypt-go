@@ -10,11 +10,13 @@ import (
 	"io"
 )
 
+// EncryptResult represents the result of encryption
 type EncryptResult struct {
 	Ciphertext string `json:"ciphertext"`
 	IV         string `json:"iv"`
 }
 
+// Hash hashes the input data using the specified algorithm
 func Hash(input string, algorithm string) (string, error) {
 	var hash []byte
 
@@ -38,6 +40,7 @@ func Hash(input string, algorithm string) (string, error) {
 	return hex.EncodeToString(hash), nil
 }
 
+// Encrypt encrypts the plaintext using the provided secret key
 func Encrypt(plaintext, secretKey string) (*EncryptResult, error) {
 	key, err := hex.DecodeString(secretKey)
 	if err != nil {
@@ -83,6 +86,7 @@ func Encrypt(plaintext, secretKey string) (*EncryptResult, error) {
 	}, nil
 }
 
+// Decrypt decrypts the ciphertext using the provided secret key and IV
 func Decrypt(ciphertext, secretKey, iv string) (string, error) {
 	key, err := hex.DecodeString(secretKey)
 	if err != nil {

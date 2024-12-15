@@ -13,6 +13,7 @@ import (
 	"hash"
 )
 
+// SignOptions represents the options for signing data
 type SignOptions struct {
 	Data       string
 	PrivateKey string
@@ -20,6 +21,7 @@ type SignOptions struct {
 	Algorithm  string
 }
 
+// VerifyOptions represents the options for verifying data
 type VerifyOptions struct {
 	Data      string
 	Signature string
@@ -28,6 +30,7 @@ type VerifyOptions struct {
 	Algorithm string
 }
 
+// Sign signs the data using the provided options
 func Sign(options SignOptions) (string, error) {
 	if options.PrivateKey != "" {
 		return SignAssymetric(options.Data, options.PrivateKey)
@@ -42,6 +45,7 @@ func Sign(options SignOptions) (string, error) {
 	return SignSymmetric(options.Data, options.Secret, options.Algorithm)
 }
 
+// Verify verifies the data using the provided options
 func Verify(options VerifyOptions) bool {
 	if options.PublicKey != "" {
 		result, err := VerifyAssymetric(options.Data, options.Signature, options.PublicKey)
@@ -60,6 +64,7 @@ func Verify(options VerifyOptions) bool {
 	return false
 }
 
+// SignAssymetric signs the data using the provided private key
 func SignAssymetric(data, privateKeyPEM string) (string, error) {
 	block, _ := pem.Decode([]byte(privateKeyPEM))
 	if block == nil {
@@ -91,6 +96,7 @@ func SignAssymetric(data, privateKeyPEM string) (string, error) {
 	return base64.StdEncoding.EncodeToString(signature), nil
 }
 
+// VerifyAssymetric verifies the data using the provided public key
 func VerifyAssymetric(data, signature, publicKeyPEM string) (bool, error) {
 	sig, err := base64.StdEncoding.DecodeString(signature)
 	if err != nil {
@@ -118,6 +124,7 @@ func VerifyAssymetric(data, signature, publicKeyPEM string) (bool, error) {
 	return err == nil, nil
 }
 
+// SignSymmetric signs the data using the provided secret key
 func SignSymmetric(data, secret, algorithm string) (string, error) {
 	var h hash.Hash
 	switch algorithm {
@@ -137,6 +144,7 @@ func SignSymmetric(data, secret, algorithm string) (string, error) {
 	return base64.StdEncoding.EncodeToString(h.Sum(nil)), nil
 }
 
+// VerifySymmetric verifies the data using the provided secret key
 func VerifySymmetric(data, signature, secret, algorithm string) (bool, error) {
 	expectedSig, err := SignSymmetric(data, secret, algorithm)
 	if err != nil {
