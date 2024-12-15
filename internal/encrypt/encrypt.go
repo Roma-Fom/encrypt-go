@@ -82,3 +82,62 @@ func Encrypt(plaintext, secretKey string) (*EncryptResult, error) {
 		IV:         hex.EncodeToString(nonce),
 	}, nil
 }
+
+func Decrypt(ciphertext, secretKey, iv string) (string, error) {
+	key, err := hex.DecodeString(secretKey)
+	if err != nil {
+		return "", &EncryptError{
+			Message: err.Error(),
+			Reason:  "Invalid secret key format",
+			Code:    ErrorCodeEncrypt,
+		}
+	}
+
+	ciphertextBytes, err := hex.DecodeString(ciphertext)
+	if err != nil {
+		return "", &EncryptError{
+			Message: err.Error(),
+			Reason:  "Invalid ciphertext format",
+			Code:    ErrorCodeDecrypt,
+		}
+	}
+
+	nonce, err := hex.DecodeString(iv)
+	if err != nil {
+		return "", &EncryptError{
+			Message: err.Error(),
+			Reason:  "Invalid IV format",
+			Code:    ErrorCodeDecrypt,
+		}
+	}
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return "", &EncryptError{
+			Message: err.Error(),
+			Reason:  "Failed to create cipher",
+			Code:    ErrorCodeDecrypt,
+		}
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return "", &EncryptError{
+			Message: err.Error(),
+			Reason:  "Failed to create GCM",
+			Code:    ErrorCodeDecrypt,
+		}
+	}
+
+	plaintext, err := gcm.Open(nil, nonce, ciphertextBytes, nil)
+	if err != nil {
+		return "", &EncryptError{
+			Message: err.Error(),
+			Reason:  "Decryption failed",
+			Code:    ErrorCodeDecrypt,
+		}
+	}
+
+	return string(plaintext), nil
+
+}
