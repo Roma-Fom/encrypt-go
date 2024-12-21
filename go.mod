@@ -1,4 +1,4 @@
-module github.com/roma-fom/encrypt-tools
+module github.com/roma-fom/encrypt-go
 
 go 1.23.2
 

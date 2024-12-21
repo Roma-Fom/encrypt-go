@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/roma-fom/encrypt-tools/pkg/encrypt"
+	"github.com/roma-fom/encrypt-go/pkg/encrypt"
 )
 
 type Metadata struct {
